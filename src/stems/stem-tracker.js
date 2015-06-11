@@ -51,7 +51,7 @@ function StemTracker(editor, onClick) {
 
     // Get top-level element containing current selection / cursor, if any
     var elem = getTopLevelBlockElem( point.node )
-    if (!needsStem(elem)){
+    if (!needsStem(elem) && stem){
       stem.remove()
     } else {
       stem = Stem.getOrCreate( elem, onClick, me.containerElem );
