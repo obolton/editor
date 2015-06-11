@@ -59,6 +59,7 @@ function Toolbar(editor) {
   ul.className = 'qed-toolbar-actions';
 
   me.elem.appendChild(ul);
+  me.buttonContainer = ul;
 
   me.actions = [];
 
@@ -144,13 +145,40 @@ Toolbar.prototype.addDefaultLinkButton = function(label) {
   me.editor.addListener({
     onSelection: function(selection) {
       if (me.urlTextbox) {
-        me.elem.remove(me.urlTextbox);
-        me.urlTextbox = null;
-        me.elem.firstChild.style.display = 'inline';
+        me.buttonContainer.style.display = '';
+        me.urlTextbox.style.display = 'none';
       }
       return false;
     }
   });
+
+  // Define the url input box
+  var urlTextbox = document.createElement("input");
+  me.elem.insertBefore(urlTextbox, me.elem.firstChild);
+  urlTextbox.className = 'qed-toolbar-link';
+  urlTextbox.style.display = 'none';
+  me.urlTextbox = urlTextbox;
+  urlTextbox.focus();
+  urlTextbox.onkeyup = function(e) {
+
+    if (e.keyCode === 13) {
+	  // Set browsers selection back on what it was before
+      editor.selection().setEndpoints(range.anchor, range.focus);
+
+      // Add link to selection
+      document.execCommand('createLink', true, urlTextbox.value);
+
+      // Remove textbox
+      me.elem.removeChild(urlTextbox);
+
+      // Show buttons
+      me.elem.firstChild.style.display = 'block';
+
+      return true;
+    }
+
+    return;
+  };
 
   var linkCheck = function(editor) {
     var iDec = new InlineDecorator();
@@ -163,36 +191,13 @@ Toolbar.prototype.addDefaultLinkButton = function(label) {
   var linkCallback = function(editor, toggle) {
 
     // Hide buttons
-    me.elem.firstChild.style.display = 'none';
+    me.buttonContainer.style.display = 'none';
 
     // Save selection
     var range = editor.selection().getRange();
 
     // Show textbox
-    var urlTextbox = document.createElement("input");
-    me.elem.appendChild(urlTextbox);
-    me.urlTextbox = urlTextbox;
-    urlTextbox.focus();
-    urlTextbox.onkeyup = function(e) {
-
-      if (e.keyCode === 13) {
-        // Set browsers selection back on what it was before
-        editor.selection().setEndpoints(range.anchor, range.focus);
-
-        // Add link to selection
-        document.execCommand('createLink', true, urlTextbox.value);
-
-        // Remove textbox
-        me.elem.removeChild(urlTextbox);
-
-        // Show buttons
-        me.elem.firstChild.style.display = 'block';
-
-        return true;
-      }
-
-      return;
-    };
+    me.urlTextbox.style.display = 'inline';
 
     return;
   };
