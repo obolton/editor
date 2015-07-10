@@ -40,7 +40,7 @@ function Toolbar(editor) {
       return false;
     }
   });
-  
+
 
 
   // TODO: use dom DSL lib instead of all this boilerplate.
@@ -158,21 +158,33 @@ Toolbar.prototype.addDefaultLinkButton = function(label) {
   urlTextbox.className = 'qed-toolbar-link';
   urlTextbox.style.display = 'none';
   me.urlTextbox = urlTextbox;
-  urlTextbox.focus();
-  urlTextbox.onkeyup = function(e) {
+  me.urlTextbox.onkeyup = function(e) {
 
     if (e.keyCode === 13) {
-	  // Set browsers selection back on what it was before
-      editor.selection().setEndpoints(range.anchor, range.focus);
+
+      range = me.urlTextbox.range;
+
+      // Set browsers selection back on what it was before
+      me.editor.selection().setEndpoints(range.anchor, range.focus);
+
+      // We check for "://" to test for a specified protocol, if none is
+      // specified then we'll default to http://. This is to avoid the default
+      // behaviour of createLink to append the value to the current location
+      if (urlTextbox.value.indexOf("://") < 0) {
+        urlTextbox.value = "http://" + urlTextbox.value;
+      }
 
       // Add link to selection
-      document.execCommand('createLink', true, urlTextbox.value);
+      document.execCommand('createLink', false, urlTextbox.value);
+
+      // Clear the url value
+      urlTextbox.value = '';
 
       // Remove textbox
-      me.elem.removeChild(urlTextbox);
+      me.urlTextbox.style.display = 'none';
 
       // Show buttons
-      me.elem.firstChild.style.display = 'block';
+      me.buttonContainer.style.display = 'block';
 
       return true;
     }
@@ -193,15 +205,19 @@ Toolbar.prototype.addDefaultLinkButton = function(label) {
     // Hide buttons
     me.buttonContainer.style.display = 'none';
 
-    // Save selection
-    var range = editor.selection().getRange();
-
     // Show textbox
     me.urlTextbox.style.display = 'inline';
+
+    // Save selection
+    var range = me.editor.selection().getRange();
+    me.urlTextbox.range = range;
+
+
+    me.urlTextbox.focus();
+
 
     return;
   };
 
   this.addButton(label, linkCheck, linkCallback);
 };
-
