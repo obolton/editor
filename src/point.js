@@ -356,10 +356,14 @@ function joinRight(joinPoint) {
     return Point.before(joinPoint.node);
   }
 
-  if (dest.hasChildNodes()) {
-    resultPoint = Point.before(dest.firstChild);
+  if (source.hasChildNodes()) {
+    if (source.lastChild.nodeType === 3) {
+      resultPoint = Point.text(source.lastChild, source.lastChild.textContent.length)
+    } else {
+      resultPoint = Point.after(source.lastChild);
+    }
   } else {
-    resultPoint = Point.end(dest);
+    resultPoint = Point.start(dest);
   }
 
   if (joinPoint.type === BEFORE) {
@@ -378,12 +382,19 @@ function joinRight(joinPoint) {
   }
 
   // Before normalizing, check if the result point and any (new) previous sibling node are text.
-  // If so set the offset to the length of the previous sibling's text
+  // If so grab a value for the new offset that is the length of the previous sibling's text
   if (resultPoint.node.previousSibling && resultPoint.node.nodeType === 3 && resultPoint.node.previousSibling.nodeType === 3) {
-    resultPoint.moveToText(resultPoint.node, resultPoint.node.previousSibling.length);
+    newOffset = resultPoint.node.previousSibling.length;
+  } else {
+    newOffset = null;
   }
 
   dest.normalize();
+
+  // If we calculated a new offset, set resultPoint to the new offset
+  if (newOffset) {
+    resultPoint.moveToText(resultPoint.node, newOffset);
+  }
 
   return resultPoint;
 };
