@@ -349,7 +349,7 @@ function joinRight(joinPoint) {
   joinPoint = joinPoint.rightNormalized();
 
   source = joinPoint.node.previousSibling;
-  dest = source.nextSibling;
+  dest = joinPoint.node;
   parentNode = dest.parentNode;
 
   if (!source) {
@@ -400,7 +400,7 @@ function joinLeft(joinPoint) {
   joinPoint = joinPoint.leftNormalized();
 
   source = joinPoint.node.nextSibling;
-  dest = source.previousSibling;
+  dest = joinPoint.node;
   parentNode = dest.parentNode;
 
 
