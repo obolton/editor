@@ -21,7 +21,7 @@ function Placeholder(elem, tracker) {
   me.holder.innerHTML = "<" + tag + ">" + text + "</" + tag + ">";
 
   me.holder.style.position = "absolute";
-  me.holder.style['z-index'] = -1;
+  me.holder.style['z-index'] = 0;
 
   me.container.appendChild(me.holder);
 
@@ -31,8 +31,8 @@ function Placeholder(elem, tracker) {
 /** Positions the placeholder based on current position of tracked elements */
 Placeholder.prototype.reposition = function() {
 
-  /* The position of the placeholder is calculated by getting the 
-  * difference between the element getting the placeholder and the top of 
+  /* The position of the placeholder is calculated by getting the
+  * difference between the element getting the placeholder and the top of
   * the placeholder-tracker. To complicate this, any margins applied to the
   * placeholder html will define the edge of the placeholder div but won't
   * get accounted for when grabbing the top of the element the placeholder
